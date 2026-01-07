@@ -13,3 +13,32 @@ datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
 }
+
+model Meal {
+  id        Int      @id @default(autoincrement())
+  name      String
+  price     Decimal  @db.Decimal(10, 2)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  orders    OrderMeal[]
+}
+
+model Order {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  meals     OrderMeal[]
+}
+
+model OrderMeal {
+  id        Int      @id @default(autoincrement())
+  orderId   Int
+  mealId    Int
+  quantity  Int
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  meal      Meal     @relation(fields: [mealId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([orderId, mealId])
+}
